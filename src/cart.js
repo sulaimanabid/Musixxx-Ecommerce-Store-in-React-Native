@@ -79,6 +79,41 @@ const CartScreen = ({ onCartItemCountChange }) => {
       onCartItemCountChange(cartItems.length);
     }
   }, [cartItems]);
+  
+  
+  const generateAlert = (text) => {
+  Alert.alert("Alert", text); // to genreate alert with custom texts
+};
+
+const handleAddToCart = async (item, onCartItemCountChange) => {
+  // function to add item to the cart
+  try {
+    let cart = await AsyncStorage.getItem("cart"); // getting current cart data
+    cart = JSON.parse(cart) || [];
+    let itemFound = cart.find(({ title }) => title === item.title);
+    if (itemFound) {
+      generateAlert("Item is already in the cart");
+      return;
+    }
+    cart = [...cart, { ...item, amount: 1 }]; // adding item in the cart
+    AsyncStorage.setItem("cart", JSON.stringify(cart)); // storing in persisent async storage
+    generateAlert("Item added in the cart"); // generating alert
+    onCartItemCountChange(cart.length); // callback called to set cart item count over cart icon
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const getIntialCartItemCount = async () => {
+  try {
+    let cart = await AsyncStorage.getItem("cart"); // getting current cart data
+    cart = JSON.parse(cart) || [];
+    return cart.length; // returning cart items count
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 
   const renderCartCard = ({
     index,
